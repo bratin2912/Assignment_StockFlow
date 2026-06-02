@@ -7,7 +7,10 @@ import routes from './routes';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://assignment.ecohub.biz',
+  credentials: true,
+}));
 
 app.use(helmet());
 
