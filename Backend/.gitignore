@@ -3,3 +3,5 @@
 /src/generated/prisma
 
 .env
+
+/dist

@@ -191,3 +191,95 @@ export const adjustStock = async (
     },
   });
 };
+
+export const getLowStockProducts = async (organizationId: string) => {
+  const organization = await prisma.organization.findFirst({
+    where: {
+      id: organizationId,
+    },
+  });
+
+  if (!organization) {
+    throw new Error('Organization not found');
+  }
+
+  const products = await prisma.product.findMany({
+    where: {
+      organizationId,
+      OR: [
+        {
+          quantityOnHand: {
+            lte: prisma.product.fields.lowStockThreshold,
+          },
+          lowStockThreshold: {
+            not: null,
+          },
+        },
+        {
+          quantityOnHand: {
+            lte: organization.defaultLowStockThreshold,
+          },
+          lowStockThreshold: null,
+        },
+      ],
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return products;
+};
+
+export const getDashboardStats = async (organizationId: string) => {
+  const organization = await prisma.organization.findFirst({
+    where: { id: organizationId },
+  });
+
+  if (!organization) {
+    throw new Error('Organization not found');
+  }
+
+  const [totalProducts, totalInventory, lowStockCount] = await Promise.all([
+    prisma.product.count({
+      where: {
+        organizationId,
+      },
+    }),
+    prisma.product.aggregate({
+      where: {
+        organizationId,
+      },
+      _sum: {
+        quantityOnHand: true,
+      },
+    }),
+    prisma.product.count({
+      where: {
+        organizationId,
+        OR: [
+          {
+            quantityOnHand: {
+              lte: prisma.product.fields.lowStockThreshold,
+            },
+            lowStockThreshold: {
+              not: null,
+            },
+          },
+          {
+            quantityOnHand: {
+              lte: organization.defaultLowStockThreshold,
+            },
+            lowStockThreshold: null,
+          },
+        ],
+      },
+    }),
+  ]);
+
+  return {
+    totalProducts,
+    totalInventory: totalInventory._sum.quantityOnHand || 0,
+    lowStockCount,
+  };
+};

@@ -96,4 +96,54 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/low-stock', async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const products = await productService.getLowStockProducts(user.organizationId);
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({
+      message: error instanceof Error ? error.message : 'Something went wrong',
+    });
+  }
+});
+
+router.get('/stats/dashboard', async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const stats = await productService.getDashboardStats(user.organizationId);
+    res.json(stats);
+  } catch (error) {
+    res.status(400).json({
+      message: error instanceof Error ? error.message : 'Something went wrong',
+    });
+  }
+});
+
+router.post('/:id/adjust-stock', async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const { id } = req.params;
+    const { adjustment } = req.body;
+    if (!id || adjustment === undefined) {
+      return res.status(400).json({ message: 'Product ID and adjustment are required' });
+    }
+    const product = await productService.adjustStock(String(id), user.organizationId, parseInt(adjustment));
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({
+      message: error instanceof Error ? error.message : 'Something went wrong',
+    });
+  }
+});
+
 export default router;
