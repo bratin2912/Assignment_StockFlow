@@ -8,7 +8,12 @@ export interface LoginInput {
 export interface SignupInput {
   email: string;
   password: string;
-  organizationName: string;
+  organizationId: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
 }
 
 export const login = async (data: LoginInput) => {
@@ -17,4 +22,8 @@ export const login = async (data: LoginInput) => {
 
 export const signup = async (data: SignupInput) => {
   return axios.post('/auth/signup', data);
+};
+
+export const getOrganizations = async () => {
+  return axios.get<Organization[]>('/organizations');
 };

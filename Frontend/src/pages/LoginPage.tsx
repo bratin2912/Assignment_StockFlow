@@ -1,15 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { authStore } from '../stores/auth.store';
 import * as authApi from '../api/auth.api';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Card, message } from 'antd';
+import { Form, Input, Button, Card, message, Select } from 'antd';
 import { UserOutlined, LockOutlined, TeamOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [organizations, setOrganizations] = useState<authApi.Organization[]>([]);
+  const [organizationsLoading, setOrganizationsLoading] = useState(false);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (isSignup) {
+      fetchOrganizations();
+    }
+  }, [isSignup]);
+
+  const fetchOrganizations = async () => {
+    setOrganizationsLoading(true);
+    try {
+      const res = await authApi.getOrganizations();
+      setOrganizations(res.data);
+    } catch (err: any) {
+      message.error('Failed to fetch organizations');
+    } finally {
+      setOrganizationsLoading(false);
+    }
+  };
 
   const handleLogin = async (values: any) => {
     setIsLoading(true);
@@ -70,15 +92,21 @@ export default function LoginPage() {
         >
           {isSignup && (
             <Form.Item
-              name="organizationName"
-              label="Organization Name"
-              rules={[{ required: true, message: 'Please enter your organization name' }]}
+              name="organizationId"
+              label="Organization"
+              rules={[{ required: true, message: 'Please select an organization' }]}
             >
-              <Input
-                prefix={<TeamOutlined />}
-                placeholder="Enter organization name"
-                disabled={isLoading}
-              />
+              <Select
+                placeholder="Select an organization"
+                disabled={isLoading || organizationsLoading}
+                loading={organizationsLoading}
+              >
+                {organizations.map(organization => (
+                  <Option key={organization.id} value={organization.id}>
+                    {organization.name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           )}
 
