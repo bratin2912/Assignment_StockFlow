@@ -3,7 +3,7 @@ import { authStore } from '../stores/auth.store';
 import * as authApi from '../api/auth.api';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Select } from 'antd';
-import { UserOutlined, LockOutlined, TeamOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 

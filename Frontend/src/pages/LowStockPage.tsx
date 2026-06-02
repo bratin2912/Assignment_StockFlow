@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { productStore } from '../stores/product.store';
 import { observer } from 'mobx-react-lite';
-import { Table, Tag, Card, Badge } from 'antd';
+import { Table, Tag, Card, Badge, Skeleton } from 'antd';
 import { WarningOutlined } from '@ant-design/icons';
 
 const LowStockPage = observer(() => {
@@ -35,6 +35,21 @@ const LowStockPage = observer(() => {
       render: (value: number) => value || 5,
     },
   ];
+
+  if (productStore.isLoadingLowStock) {
+    return (
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 'bold', margin: 0 }}>Low Stock Products</h1>
+          <Skeleton.Button active size="large" style={{ width: 120 }} />
+        </div>
+
+        <Card bordered={false}>
+          <Skeleton active paragraph={{ rows: 6 }} />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div>

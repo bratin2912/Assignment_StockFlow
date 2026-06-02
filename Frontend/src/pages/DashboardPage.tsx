@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { productStore } from '../stores/product.store';
 import { observer } from 'mobx-react-lite';
-import { Card, Table, Tag } from 'antd';
+import { Card, Table, Tag, Skeleton } from 'antd';
 import { ShoppingOutlined, DatabaseOutlined, WarningOutlined } from '@ant-design/icons';
 
 const DashboardPage = observer(() => {
@@ -57,6 +57,34 @@ const DashboardPage = observer(() => {
       bgColor: '#fff7e6',
     },
   ];
+
+  if (productStore.isLoadingDashboardStats || productStore.isLoadingLowStock) {
+    return (
+      <div>
+        <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 24 }}>Dashboard</h1>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: 16, 
+          marginBottom: 32 
+        }}>
+          {[1, 2, 3].map((index) => (
+            <Card key={index} bordered={false} style={{ borderRadius: 8 }}>
+              <Skeleton active paragraph={{ rows: 2 }} />
+            </Card>
+          ))}
+        </div>
+
+        <div>
+          <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>Low Stock Products</h2>
+          <Card bordered={false}>
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

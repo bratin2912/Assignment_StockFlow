@@ -9,42 +9,76 @@ class ProductStore {
     totalInventory: number;
     lowStockCount: number;
   } | null = null;
+  isLoadingProducts = false;
+  isLoadingLowStock = false;
+  isLoadingDashboardStats = false;
 
   constructor() {
     makeAutoObservable(this);
   }
 
   async fetchProducts(search?: string) {
-    const res = await productApi.getProducts(search);
-    action(() => {
-      this.products = res.data;
-    })();
+    this.isLoadingProducts = true;
+    try {
+      const res = await productApi.getProducts(search);
+      action(() => {
+        this.products = res.data;
+      })();
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      this.isLoadingProducts = false;
+    }
   }
 
   async fetchLowStock() {
-    const res = await productApi.getLowStockProducts();
-    action(() => {
-      this.lowStockProducts = res.data;
-    })();
+    this.isLoadingLowStock = true;
+    try {
+      const res = await productApi.getLowStockProducts();
+      action(() => {
+        this.lowStockProducts = res.data;
+      })();
+    } catch (error) {
+      console.error('Error fetching low stock products:', error);
+    } finally {
+      this.isLoadingLowStock = false;
+    }
   }
 
   async fetchDashboardStats() {
-    const res = await productApi.getDashboardStats();
-    action(() => {
-      this.dashboardStats = res.data;
-    })();
+    this.isLoadingDashboardStats = true;
+    try {
+      const res = await productApi.getDashboardStats();
+      action(() => {
+        this.dashboardStats = res.data;
+      })();
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    } finally {
+      this.isLoadingDashboardStats = false;
+    }
   }
 
   async createProduct(data: productApi.CreateProductInput) {
-    const res = await productApi.createProduct(data);
-    action(() => {
-      this.products.unshift(res.data);
-    })();
-    return res.data;
+    try {
+      const res = await productApi.createProduct(data);
+      return res.data;
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
   }
 
   async updateProduct(id: string, data: productApi.UpdateProductInput) {
-    const res = await productApi.updateProduct(id, data);
+    const processedData = {
+      ...data,
+      quantityOnHand: data.quantityOnHand !== undefined ? Number(data.quantityOnHand) : undefined,
+      costPrice: data.costPrice !== undefined ? Number(data.costPrice) : undefined,
+      sellingPrice: data.sellingPrice !== undefined ? Number(data.sellingPrice) : undefined,
+      lowStockThreshold: data.lowStockThreshold !== undefined ? Number(data.lowStockThreshold) : undefined,
+    };
+
+    const res = await productApi.updateProduct(id, processedData);
     action(() => {
       const index = this.products.findIndex(p => p.id === id);
       if (index !== -1) {

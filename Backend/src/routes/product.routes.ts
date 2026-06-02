@@ -39,6 +39,21 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/low-stock', async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const products = await productService.getLowStockProducts(user.organizationId);
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({
+      message: error instanceof Error ? error.message : 'Something went wrong',
+    });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { user } = req;
@@ -91,21 +106,6 @@ router.delete('/:id', async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(404).json({
-      message: error instanceof Error ? error.message : 'Something went wrong',
-    });
-  }
-});
-
-router.get('/low-stock', async (req, res) => {
-  try {
-    const { user } = req;
-    if (!user) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    const products = await productService.getLowStockProducts(user.organizationId);
-    res.json(products);
-  } catch (error) {
-    res.status(400).json({
       message: error instanceof Error ? error.message : 'Something went wrong',
     });
   }

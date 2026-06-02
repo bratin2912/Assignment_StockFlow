@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { settingsStore } from '../stores/settings.store';
 import { observer } from 'mobx-react-lite';
-import { Form, InputNumber, Button, Card, message } from 'antd';
+import { Form, InputNumber, Button, Card, message, Skeleton } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 
 const SettingsPage = observer(() => {
@@ -38,7 +38,17 @@ const SettingsPage = observer(() => {
   if (isLoading) {
     return (
       <div style={{ padding: 24 }}>
-        <div style={{ color: '#8c8c8c' }}>Loading settings...</div>
+        <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 32 }}>Settings</h1>
+        
+        <div style={{ display: 'grid', gap: 24 }}>
+          <Card title="Organization Settings" bordered={false}>
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </Card>
+
+          <Card title="Account Information" bordered={false}>
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </Card>
+        </div>
       </div>
     );
   }

@@ -206,29 +206,20 @@ export const getLowStockProducts = async (organizationId: string) => {
   const products = await prisma.product.findMany({
     where: {
       organizationId,
-      OR: [
-        {
-          quantityOnHand: {
-            lte: prisma.product.fields.lowStockThreshold,
-          },
-          lowStockThreshold: {
-            not: null,
-          },
-        },
-        {
-          quantityOnHand: {
-            lte: organization.defaultLowStockThreshold,
-          },
-          lowStockThreshold: null,
-        },
-      ],
     },
     orderBy: {
       createdAt: 'desc',
     },
   });
 
-  return products;
+  const filteredProducts = products.filter(product => {
+    if (product.lowStockThreshold !== null) {
+      return product.quantityOnHand <= product.lowStockThreshold;
+    }
+    return product.quantityOnHand <= organization.defaultLowStockThreshold;
+  });
+
+  return filteredProducts;
 };
 
 export const getDashboardStats = async (organizationId: string) => {
@@ -240,7 +231,20 @@ export const getDashboardStats = async (organizationId: string) => {
     throw new Error('Organization not found');
   }
 
-  const [totalProducts, totalInventory, lowStockCount] = await Promise.all([
+  const products = await prisma.product.findMany({
+    where: {
+      organizationId,
+    },
+  });
+
+  const lowStockCount = products.filter(product => {
+    if (product.lowStockThreshold !== null) {
+      return product.quantityOnHand <= product.lowStockThreshold;
+    }
+    return product.quantityOnHand <= organization.defaultLowStockThreshold;
+  }).length;
+
+  const [totalProducts, totalInventory] = await Promise.all([
     prisma.product.count({
       where: {
         organizationId,
@@ -252,27 +256,6 @@ export const getDashboardStats = async (organizationId: string) => {
       },
       _sum: {
         quantityOnHand: true,
-      },
-    }),
-    prisma.product.count({
-      where: {
-        organizationId,
-        OR: [
-          {
-            quantityOnHand: {
-              lte: prisma.product.fields.lowStockThreshold,
-            },
-            lowStockThreshold: {
-              not: null,
-            },
-          },
-          {
-            quantityOnHand: {
-              lte: organization.defaultLowStockThreshold,
-            },
-            lowStockThreshold: null,
-          },
-        ],
       },
     }),
   ]);

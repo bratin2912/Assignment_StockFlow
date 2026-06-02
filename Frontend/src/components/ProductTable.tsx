@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import type { Product } from '../api/product.api';
-import { Table, Button, Input, InputNumber, Tag, Popconfirm, message } from 'antd';
+import { Table, Button, Input, InputNumber, Tag, Popconfirm, message, Skeleton } from 'antd';
 import { EditOutlined, SaveOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 
 interface Props {
   products: Product[];
   onEdit?: (id: string, data: Partial<Product>) => void;
   onDelete?: (id: string) => void;
+  loading?: boolean;
 }
 
 export default function ProductTable({
   products,
   onEdit,
   onDelete,
+  loading = false,
 }: Props) {
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Product>>({});
@@ -183,6 +185,41 @@ export default function ProductTable({
       },
     },
   ];
+
+  if (loading) {
+    return (
+      <div style={{ padding: '20px 0' }}>
+        {[1, 2, 3, 4, 5].map((index) => (
+          <div key={index} style={{ 
+            display: 'flex', 
+            gap: 16, 
+            padding: '16px 0', 
+            borderBottom: '1px solid #f0f0f0' 
+          }}>
+            <div style={{ flex: 2 }}>
+              <Skeleton.Input active style={{ width: '80%' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <Skeleton.Input active style={{ width: '60%' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <Skeleton.Input active style={{ width: '40%' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <Skeleton.Input active style={{ width: '50%' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <Skeleton.Input active style={{ width: '40%' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <Skeleton.Button active size="small" style={{ marginRight: 8 }} />
+              <Skeleton.Button active size="small" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <Table

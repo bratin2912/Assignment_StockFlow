@@ -7,13 +7,13 @@ export const createProductSchema = z.object({
 
   description: z.string().optional(),
 
-  quantityOnHand: z.number().int().min(0),
+  quantityOnHand: z.union([z.number().int().min(0), z.string().transform(val => parseInt(val, 10))]),
 
-  costPrice: z.number().optional(),
+  costPrice: z.union([z.number().optional(), z.string().transform(val => parseFloat(val))]),
 
-  sellingPrice: z.number().optional(),
+  sellingPrice: z.union([z.number().optional(), z.string().transform(val => parseFloat(val))]),
 
-  lowStockThreshold: z.number().int().optional(),
+  lowStockThreshold: z.union([z.number().int().optional(), z.string().transform(val => parseInt(val, 10))]),
 });
 
 export const updateProductSchema =

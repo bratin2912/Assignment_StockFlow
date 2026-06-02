@@ -48,7 +48,14 @@ export const createProduct = async (data: CreateProductInput) => {
 };
 
 export const updateProduct = async (id: string, data: UpdateProductInput) => {
-  return axios.put(`/products/${id}`, data);
+  const processedData = {
+    ...data,
+    quantityOnHand: data.quantityOnHand !== undefined ? Number(data.quantityOnHand) : undefined,
+    costPrice: data.costPrice !== undefined ? Number(data.costPrice) : undefined,
+    sellingPrice: data.sellingPrice !== undefined ? Number(data.sellingPrice) : undefined,
+    lowStockThreshold: data.lowStockThreshold !== undefined ? Number(data.lowStockThreshold) : undefined,
+  };
+  return axios.put(`/products/${id}`, processedData);
 };
 
 export const deleteProduct = async (id: string) => {
