@@ -35,10 +35,19 @@ export const createProduct = async (
     throw new Error('SKU already exists');
   }
 
-  return prisma.product.create({
+  await prisma.product.create({
     data: {
       organizationId,
       ...data,
+    },
+  });
+
+  return prisma.product.findMany({
+    where: {
+      organizationId,
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 };
@@ -123,12 +132,21 @@ export const updateProduct = async (
     }
   }
 
-  return prisma.product.update({
+  await prisma.product.update({
     where: {
       id,
       organizationId,
     },
     data,
+  });
+
+  return prisma.product.findMany({
+    where: {
+      organizationId,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 };
 
@@ -154,9 +172,14 @@ export const deleteProduct = async (
     },
   });
 
-  return {
-    message: 'Product deleted successfully',
-  };
+  return prisma.product.findMany({
+    where: {
+      organizationId,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 };
 
 export const adjustStock = async (

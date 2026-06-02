@@ -31,16 +31,18 @@ function ProductsPage() {
       {showAddForm && (
         <Card style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 24 }}>Add New Product</h2>
-          <ProductForm onSubmit={(data) => {
-            productStore.createProduct(data)
-              .then(() => {
-                productStore.fetchProducts(searchTerm);
-                setShowAddForm(false);
-              })
-              .catch((error) => {
-                console.error('Error creating product:', error);
-              });
-          }} />
+          <ProductForm 
+            onSubmit={(data) => {
+              productStore.createProduct(data)
+                .then(() => {
+                  setShowAddForm(false);
+                })
+                .catch((error) => {
+                  console.error('Error creating product:', error);
+                });
+            }} 
+            loading={productStore.isCreatingProduct}
+          />
         </Card>
       )}
 
@@ -59,18 +61,12 @@ function ProductsPage() {
         products={productStore.products}
         onEdit={(id, data) => {
           productStore.updateProduct(id, data)
-            .then(() => {
-              productStore.fetchProducts(searchTerm);
-            })
             .catch((error) => {
               console.error('Error updating product:', error);
             });
         }}
         onDelete={(id) => {
           productStore.deleteProduct(id)
-            .then(() => {
-              productStore.fetchProducts(searchTerm);
-            })
             .catch((error) => {
               console.error('Error deleting product:', error);
             });

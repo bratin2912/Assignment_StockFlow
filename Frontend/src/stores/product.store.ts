@@ -12,6 +12,7 @@ class ProductStore {
   isLoadingProducts = false;
   isLoadingLowStock = false;
   isLoadingDashboardStats = false;
+  isCreatingProduct = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -60,12 +61,18 @@ class ProductStore {
   }
 
   async createProduct(data: productApi.CreateProductInput) {
+    this.isCreatingProduct = true;
     try {
       const res = await productApi.createProduct(data);
+      action(() => {
+        this.products = res.data;
+      })();
       return res.data;
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
+    } finally {
+      this.isCreatingProduct = false;
     }
   }
 
@@ -80,18 +87,15 @@ class ProductStore {
 
     const res = await productApi.updateProduct(id, processedData);
     action(() => {
-      const index = this.products.findIndex(p => p.id === id);
-      if (index !== -1) {
-        this.products[index] = res.data;
-      }
+      this.products = res.data;
     })();
     return res.data;
   }
 
   async deleteProduct(id: string) {
-    await productApi.deleteProduct(id);
+    const res = await productApi.deleteProduct(id);
     action(() => {
-      this.products = this.products.filter(p => p.id !== id);
+      this.products = res.data;
     })();
   }
 

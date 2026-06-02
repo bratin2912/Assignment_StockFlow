@@ -58,7 +58,6 @@ const SettingsPage = observer(() => {
       <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 32 }}>Settings</h1>
 
       <div style={{ display: 'grid', gap: 24 }}>
-        {/* Organization Settings */}
         <Card title="Organization Settings" bordered={false}>
           <Form
             form={form}
@@ -95,7 +94,6 @@ const SettingsPage = observer(() => {
           </Form>
         </Card>
 
-        {/* Account Info */}
         <Card title="Account Information" bordered={false}>
           {settingsStore.settings && (
             <div style={{ display: 'grid', gap: 16 }}>

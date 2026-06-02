@@ -5,9 +5,10 @@ import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
 
 interface ProductFormProps {
   onSubmit: (data: CreateProductInput) => void;
+  loading?: boolean;
 }
 
-const ProductForm = ({ onSubmit }: ProductFormProps) => {
+const ProductForm = ({ onSubmit, loading = false }: ProductFormProps) => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -99,10 +100,10 @@ const ProductForm = ({ onSubmit }: ProductFormProps) => {
         <Button
           type="primary"
           htmlType="submit"
-          loading={isLoading}
+          loading={loading || isLoading}
           icon={<SaveOutlined />}
         >
-          {isLoading ? 'Creating...' : 'Create Product'}
+          {loading || isLoading ? 'Creating...' : 'Create Product'}
         </Button>
       </div>
     </Form>
