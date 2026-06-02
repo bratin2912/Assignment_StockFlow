@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id                       String    @id @default(uuid())
+  name                     String
+
+  defaultLowStockThreshold Int       @default(5)
+
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  users                    User[]
+  products                 Product[]
+}
+
+model User {
+  id              String       @id @default(uuid())
+
+  email           String       @unique
+  password        String
+
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+model Product {
+  id                 String       @id @default(uuid())
+
+  organizationId     String
+  organization       Organization @relation(fields: [organizationId], references: [id])
+
+  name               String
+  sku                String
+
+  description        String?
+
+  quantityOnHand     Int          @default(0)
+
+  costPrice          Decimal?     @db.Decimal(10,2)
+  sellingPrice       Decimal?     @db.Decimal(10,2)
+
+  lowStockThreshold  Int?
+
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@unique([organizationId, sku])
+  @@index([organizationId])
+}
