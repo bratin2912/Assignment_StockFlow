@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, action } from 'mobx';
 import * as productApi from '../api/product.api';
 
 class ProductStore {
@@ -16,45 +16,59 @@ class ProductStore {
 
   async fetchProducts(search?: string) {
     const res = await productApi.getProducts(search);
-    this.products = res.data;
+    action(() => {
+      this.products = res.data;
+    })();
   }
 
   async fetchLowStock() {
     const res = await productApi.getLowStockProducts();
-    this.lowStockProducts = res.data;
+    action(() => {
+      this.lowStockProducts = res.data;
+    })();
   }
 
   async fetchDashboardStats() {
     const res = await productApi.getDashboardStats();
-    this.dashboardStats = res.data;
+    action(() => {
+      this.dashboardStats = res.data;
+    })();
   }
 
   async createProduct(data: productApi.CreateProductInput) {
     const res = await productApi.createProduct(data);
-    this.products.unshift(res.data);
+    action(() => {
+      this.products.unshift(res.data);
+    })();
     return res.data;
   }
 
   async updateProduct(id: string, data: productApi.UpdateProductInput) {
     const res = await productApi.updateProduct(id, data);
-    const index = this.products.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.products[index] = res.data;
-    }
+    action(() => {
+      const index = this.products.findIndex(p => p.id === id);
+      if (index !== -1) {
+        this.products[index] = res.data;
+      }
+    })();
     return res.data;
   }
 
   async deleteProduct(id: string) {
     await productApi.deleteProduct(id);
-    this.products = this.products.filter(p => p.id !== id);
+    action(() => {
+      this.products = this.products.filter(p => p.id !== id);
+    })();
   }
 
   async adjustStock(id: string, adjustment: number) {
     const res = await productApi.adjustStock(id, adjustment);
-    const index = this.products.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.products[index] = res.data;
-    }
+    action(() => {
+      const index = this.products.findIndex(p => p.id === id);
+      if (index !== -1) {
+        this.products[index] = res.data;
+      }
+    })();
     return res.data;
   }
 }
