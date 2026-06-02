@@ -3,7 +3,7 @@ import prisma from '../config/prisma';
 import { generateToken } from '../utils/jwt';
 
 export const signup = async (
-  organizationName: string,
+  organizationId: string,
   email: string,
   password: string,
 ) => {
@@ -22,40 +22,34 @@ export const signup = async (
     10,
   );
 
-  const result = await prisma.$transaction(
-    async (tx) => {
-      const organization =
-        await tx.organization.create({
-          data: {
-            name: organizationName,
-          },
-        });
-
-      const user = await tx.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-          organizationId: organization.id,
-        },
-      });
-
-      return {
-        user,
-        organization,
-      };
+  const organization = await prisma.organization.findUnique({
+    where: {
+      id: organizationId,
     },
-  );
+  });
+
+  if (!organization) {
+    throw new Error('Organization not found');
+  }
+
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      organizationId: organization.id,
+    },
+  });
 
   const token = generateToken(
-    result.user.id,
-    result.organization.id,
+    user.id,
+    organization.id,
   );
 
   return {
     token,
     user: {
-      id: result.user.id,
-      email: result.user.email,
+      id: user.id,
+      email: user.email,
     },
   };
 };

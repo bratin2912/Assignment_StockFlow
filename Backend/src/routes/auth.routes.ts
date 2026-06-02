@@ -7,8 +7,8 @@ const router = Router();
 
 router.post('/signup', validate(signupSchema), async (req, res) => {
   try {
-    const { organizationName, email, password } = req.body;
-    const result = await authService.signup(organizationName, email, password);
+    const { organizationId, email, password } = req.body;
+    const result = await authService.signup(organizationId, email, password);
     res.status(201).json(result);
   } catch (error) {
     res.status(400).json({

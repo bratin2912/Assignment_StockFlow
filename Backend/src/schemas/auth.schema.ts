@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const signupSchema = z.object({
-  organizationName: z.string().min(2),
+  organizationId: z.string().min(1, 'Please select an organization'),
 
   email: z.email(),
 
