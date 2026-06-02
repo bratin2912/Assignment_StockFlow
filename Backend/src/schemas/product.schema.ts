@@ -5,7 +5,7 @@ export const createProductSchema = z.object({
 
   sku: z.string().min(1, 'SKU is required'),
 
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
 
   quantityOnHand: z.union([z.number().int().min(0), z.string().transform(val => parseInt(val, 10))]),
 
